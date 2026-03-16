@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres-delivery:
+    image: postgres:15
+    container_name: db-delivery
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: delivery_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data # ISSO AQUI SALVA SUA VIDA. É O DISCO FÍSICO.
+
+volumes:
+  pgdata:
