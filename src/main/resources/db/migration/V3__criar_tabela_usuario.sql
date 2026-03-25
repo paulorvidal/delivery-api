@@ -1,7 +1,7 @@
 CREATE TABLE usuario (
     id UUID PRIMARY KEY,
     perfil_id INT NOT NULL,
-    restaurante_id UUID, -- Nulo se for cliente final. Preenchido se for funcionário/dono daquele restaurante
+    restaurante_id UUID, 
     nome_completo VARCHAR(255) NOT NULL,
     cpf VARCHAR(14) UNIQUE,
     telefone VARCHAR(20) NOT NULL,

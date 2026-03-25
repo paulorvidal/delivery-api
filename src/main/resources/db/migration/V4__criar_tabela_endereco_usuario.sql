@@ -9,7 +9,7 @@ CREATE TABLE endereco_usuario (
     cidade VARCHAR(100) NOT NULL,
     uf VARCHAR(2) NOT NULL,
     ponto_referencia VARCHAR(255),
-    padrao BOOLEAN NOT NULL DEFAULT FALSE, -- É o endereço principal?
+    padrao BOOLEAN NOT NULL DEFAULT FALSE, 
     
     CONSTRAINT fk_endereco_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
