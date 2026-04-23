@@ -1,4 +1,7 @@
--- 1. Núcleo de Identidade e Lojista (Sem dependências fortes)
+-- ==========================================
+-- 1. NÚCLEO DE IDENTIDADE E LOJISTA
+-- ==========================================
+
 CREATE TABLE perfil (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL UNIQUE,
@@ -44,7 +47,10 @@ CREATE TABLE restaurante (
     atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Usuários e Endereços (Dependem de Perfil e Restaurante)
+-- ==========================================
+-- 2. USUÁRIOS E ENDEREÇOS
+-- ==========================================
+
 CREATE TABLE usuario (
     id UUID PRIMARY KEY,
     perfil_id INT NOT NULL,
@@ -77,7 +83,10 @@ CREATE TABLE endereco_usuario (
     CONSTRAINT fk_endereco_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
 
--- 3. Catálogo e Configurações da Loja (Dependem de Restaurante)
+-- ==========================================
+-- 3. CATÁLOGO E CONFIGURAÇÕES DA LOJA
+-- ==========================================
+
 CREATE TABLE categoria (
     id UUID PRIMARY KEY,
     restaurante_id UUID NOT NULL,
@@ -143,7 +152,7 @@ CREATE TABLE cupom_desconto (
     id UUID PRIMARY KEY,
     restaurante_id UUID NOT NULL,
     codigo VARCHAR(20) NOT NULL,
-    tipo VARCHAR(20) NOT NULL,
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('PERCENTUAL', 'VALOR_FIXO')),
     valor DECIMAL(10, 2) NOT NULL,
     valor_minimo_pedido DECIMAL(10, 2) DEFAULT 0.00,
     data_validade TIMESTAMP,
@@ -153,7 +162,10 @@ CREATE TABLE cupom_desconto (
     CONSTRAINT fk_cupom_restaurante FOREIGN KEY (restaurante_id) REFERENCES restaurante(id)
 );
 
--- 4. Vendas e Transações (Dependem de quase tudo)
+-- ==========================================
+-- 4. VENDAS E TRANSAÇÕES
+-- ==========================================
+
 CREATE TABLE pedido (
     id UUID PRIMARY KEY,
     codigo_curto VARCHAR(10) NOT NULL,
@@ -161,14 +173,16 @@ CREATE TABLE pedido (
     usuario_id UUID NOT NULL,
     endereco_entrega_id UUID,
     
-    status VARCHAR(50) NOT NULL DEFAULT 'PENDENTE',
+    status VARCHAR(50) NOT NULL DEFAULT 'PENDENTE' 
+        CHECK (status IN ('PENDENTE', 'CONFIRMADO', 'PREPARANDO', 'SAIU_ENTREGA', 'ENTREGUE', 'CANCELADO')),
     
     subtotal DECIMAL(10, 2) NOT NULL,
     taxa_entrega DECIMAL(10, 2) NOT NULL,
     desconto DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     total DECIMAL(10, 2) NOT NULL,
     
-    forma_pagamento VARCHAR(50) NOT NULL,
+    forma_pagamento VARCHAR(50) NOT NULL 
+        CHECK (forma_pagamento IN ('PIX', 'CARTAO_APP', 'DINHEIRO', 'MAQUINA_CARTAO')),
     troco_para DECIMAL(10, 2),
     
     observacao_geral TEXT,
@@ -197,7 +211,7 @@ CREATE TABLE item_pedido (
 CREATE TABLE pagamento_pedido (
     id UUID PRIMARY KEY,
     pedido_id UUID NOT NULL UNIQUE,
-    status_gateway VARCHAR(50) NOT NULL,
+    status_gateway VARCHAR(50) NOT NULL CHECK (status_gateway IN ('APPROVED', 'REJECTED', 'PENDING')),
     transacao_id_externo VARCHAR(255),
     metodo_pagamento VARCHAR(50) NOT NULL,
     data_atualizacao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -214,3 +228,11 @@ CREATE TABLE avaliacao (
     
     CONSTRAINT fk_avaliacao_pedido FOREIGN KEY (pedido_id) REFERENCES pedido(id)
 );
+
+-- ==========================================
+-- 5. ÍNDICES PARA PERFORMANCE (Consultas Rápidas)
+-- ==========================================
+CREATE INDEX idx_produto_categoria ON produto(categoria_id);
+CREATE INDEX idx_pedido_restaurante ON pedido(restaurante_id);
+CREATE INDEX idx_pedido_usuario ON pedido(usuario_id);
+CREATE INDEX idx_item_pedido_pedido ON item_pedido(pedido_id);
