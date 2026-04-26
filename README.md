@@ -211,7 +211,7 @@ erDiagram
     ASSINATURA ||--o{ COBRANCA : gera
     COBRANCA ||--o{ PAGAMENTO : recebe_tentativas
     COBRANCA ||--o{ NOTIFICACAO_COBRANCA : dispara
-
+```
 
 ## Padrões de Projeto e Decisões Arquiteturais
 
