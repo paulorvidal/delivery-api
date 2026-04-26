@@ -1,4 +1,3 @@
-```markdown
 # SaaS Cobrança - Multi-tenant Billing API
 
 ## Visão Geral
@@ -48,7 +47,7 @@ Neste formato, o banco de dados roda em um container isolado e a aplicação Spr
 
 1.  **Clone o repositório:**
     ```bash
-    git clone https://github.com/seu-usuario/saas-cobranca.git
+    git clone [https://github.com/seu-usuario/saas-cobranca.git](https://github.com/seu-usuario/saas-cobranca.git)
     cd saas-cobranca
     ```
 
@@ -211,8 +210,8 @@ erDiagram
     CLIENTE ||--o{ COBRANCA : possui
     ASSINATURA ||--o{ COBRANCA : gera
     COBRANCA ||--o{ PAGAMENTO : recebe_tentativas
-    COBRANCA ||--o{ NOTIFICACAO_COBRANCA : dispara
-```
+    COBRANCA ||--o{ NOTIFICACAO_COBRANCA :dispara
+
 
 ## Padrões de Projeto e Decisões Arquiteturais
 
