@@ -152,6 +152,32 @@ Para ambientes de homologação ou validação rápida sem dependência do ambie
 - **Repositórios de Acesso:** Construção das interfaces `UsuarioRepository` e `PerfilRepository` (Spring Data JPA) com métodos customizados para validação de e-mail e CPF únicos no momento do cadastro.
 - **Validação de Entrada:** Integração do Spring Boot Validation (`@NotBlank`, `@Email`) na camada de DTO para garantir a consistência e integridade dos dados da requisição antes do processamento.
 
+## Padrões de Projeto e Decisões Arquiteturais
+
+Para manter a base de código escalável e segura, este projeto adota as seguintes práticas:
+
+* **Package by Feature:** A estrutura de diretórios é organizada por módulo de negócio (ex: `cliente`, `cobranca`, `tenant`), facilitando a manutenção e a futura quebra em microsserviços, se necessário.
+* **Rich Domain Model (Modelo de Domínio Rico):** Rejeição do antipadrão de modelo anêmico. O uso do Lombok é restrito (apenas `@Getter` e construtores `protected` nas entidades). O estado das entidades só é alterado através de métodos de negócio que garantem a integridade dos dados (ex: `inativar()`, em vez de `setAtivo(false)`).
+* **Fail-Fast Validation:** Validações rigorosas ocorrem nos construtores das entidades e nos filtros HTTP, abortando requisições inválidas antes que consumam recursos do servidor ou alcancem o banco de dados.
+
+## Estrutura de Diretórios Base
+
+```text
+src/main/java/br/com/paulovidal/saas_cobranca/
+ ├── config/            # Filtros de Segurança, Contexto Tenant, Swagger
+ ├── tenant/            # Entidade, Repositório e Serviço (Schema Public)
+ ├── cliente/           # Domínio de Clientes (Schema Inquilino)
+ ├── assinatura/        # Motor de Recorrência e Contratos
+ ├── cobranca/          # Emissão de Faturas e Pagamentos
+ └── webhook/           # Recepção de eventos do Gateway de Pagamento
+
+ ## Roadmap e Próximos Passos
+
+- [ ] **v0.0.2:** Mapeamento JPA das entidades de negócio (`Cliente`, `Assinatura`, `Cobranca`).
+- [ ] **v0.0.3:** Implementação do motor de Provisionamento de Tenants (Criação de Schemas sob demanda via Flyway).
+- [ ] **v0.1.0:** Autenticação e Autorização via JWT.
+- [ ] **v0.2.0:** Integração com Gateway de Pagamento (Asaas/Mercado Pago) e recepção de Webhooks.
+
 ## Diagrama de Entidade-Relacionamento (ERD)
 
 Abaixo está a representação visual do banco de dados, separando o contexto administrativo do contexto isolado do inquilino.
@@ -264,32 +290,6 @@ erDiagram
     ASSINATURA ||--o{ COBRANCA : gera
     COBRANCA ||--o{ PAGAMENTO : recebe_tentativas
     COBRANCA ||--o{ NOTIFICACAO_COBRANCA : dispara---
-
-## Padrões de Projeto e Decisões Arquiteturais
-
-Para manter a base de código escalável e segura, este projeto adota as seguintes práticas:
-
-* **Package by Feature:** A estrutura de diretórios é organizada por módulo de negócio (ex: `cliente`, `cobranca`, `tenant`), facilitando a manutenção e a futura quebra em microsserviços, se necessário.
-* **Rich Domain Model (Modelo de Domínio Rico):** Rejeição do antipadrão de modelo anêmico. O uso do Lombok é restrito (apenas `@Getter` e construtores `protected` nas entidades). O estado das entidades só é alterado através de métodos de negócio que garantem a integridade dos dados (ex: `inativar()`, em vez de `setAtivo(false)`).
-* **Fail-Fast Validation:** Validações rigorosas ocorrem nos construtores das entidades e nos filtros HTTP, abortando requisições inválidas antes que consumam recursos do servidor ou alcancem o banco de dados.
-
-## Estrutura de Diretórios Base
-
-```text
-src/main/java/br/com/paulovidal/saas_cobranca/
- ├── config/            # Filtros de Segurança, Contexto Tenant, Swagger
- ├── tenant/            # Entidade, Repositório e Serviço (Schema Public)
- ├── cliente/           # Domínio de Clientes (Schema Inquilino)
- ├── assinatura/        # Motor de Recorrência e Contratos
- ├── cobranca/          # Emissão de Faturas e Pagamentos
- └── webhook/           # Recepção de eventos do Gateway de Pagamento
-
- ## Roadmap e Próximos Passos
-
-- [ ] **v0.0.2:** Mapeamento JPA das entidades de negócio (`Cliente`, `Assinatura`, `Cobranca`).
-- [ ] **v0.0.3:** Implementação do motor de Provisionamento de Tenants (Criação de Schemas sob demanda via Flyway).
-- [ ] **v0.1.0:** Autenticação e Autorização via JWT.
-- [ ] **v0.2.0:** Integração com Gateway de Pagamento (Asaas/Mercado Pago) e recepção de Webhooks.
 
 ---
 
